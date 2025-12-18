@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureChat Pro | End-to-End Encrypted Messaging</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔒</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>SecureChat Pro</h1>
+            <p class="tagline">Military-Grade End-to-End Encrypted Messaging Platform</p>
+            <div class="security-badges">
+                <span class="badge"><i class="fas fa-shield-alt"></i> AES-256 Encryption</span>
+                <span class="badge"><i class="fas fa-key"></i> RSA-2048 Key Exchange</span>
+                <span class="badge"><i class="fas fa-user-secret"></i> Zero-Knowledge Protocol</span>
+                <span class="badge"><i class="fas fa-lock"></i> Client-Side Encryption</span>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="row">
+            <!-- Send Panel -->
+            <div class="panel send-panel">
+                <h3>Send Encrypted Message</h3>
+                
+                <div class="form-group">
+                    <label for="sender"><i class="fas fa-user-tag"></i> Your Username</label>
+                    <input type="text" id="sender" placeholder="e.g., alice@securechat" class="form-input">
+                    <div class="form-hint"><i class="fas fa-info-circle"></i> Your identity for this message</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="receiver"><i class="fas fa-user-friends"></i> Recipient Username</label>
+                    <input type="text" id="receiver" placeholder="e.g., bob@securechat" class="form-input">
+                    <div class="form-hint"><i class="fas fa-key"></i> Recipient's public key will be fetched automatically</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="message"><i class="fas fa-envelope"></i> Send Message</label>
+                    <textarea id="message" placeholder="Type your confidential message here... The message will be encrypted before it leaves your browser." 
+                              class="form-input" rows="6"></textarea>
+                    <div class="form-hint"><i class="fas fa-lock"></i> This text will be encrypted with AES-256-GCM</div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="primary-btn" onclick="encryptAndSend()">
+                        <i class="fas fa-paper-plane"></i>
+                        <span>Encrypt & Send</span>
+                    </button>
+                    <button class="secondary-btn" onclick="clearForm()">
+                        <i class="fas fa-eraser"></i>
+                        <span>Clear Form</span>
+                    </button>
+                </div>
+                
+                <div class="status-indicator status-online">
+                    <i class="fas fa-circle"></i>
+                    <span>Ready to encrypt and send</span>
+                </div>
+            </div>
+
+            <!-- Receive Panel -->
+            <div class="panel receive-panel">
+                <h3>Decrypt & Read Messages</h3>
+                
+                <div class="form-group">
+                    <label for="recvUsername"><i class="fas fa-user-circle"></i> Recipient Username</label>
+                    <input type="text" id="recvUsername" placeholder="Enter your username to decrypt messages" class="form-input">
+                    <div class="form-hint"><i class="fas fa-fingerprint"></i> Your private key will be used for decryption</div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="primary-btn" onclick="loadHistory()">
+                        <i class="fas fa-key"></i>
+                        <span>load Messages</span>
+                    </button>
+                    <button class="secondary-btn" onclick="clearMessages()">
+                        <i class="fas fa-trash"></i>
+                        <span>Clear View</span>
+                    </button>
+                </div>
+                
+                <div class="messages-container" id="historyBox">
+                    <!-- Messages will be displayed here -->
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <h3>No Messages Loaded</h3>
+                        <p>Enter your username and click "Decrypt Messages" to view your encrypted messages</p>
+                    </div>
+                </div>
+                
+                <div class="status-indicator status-offline">
+                    <i class="fas fa-circle"></i>
+                    <span>Enter username to check messages</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>© 2024 SecureChat Pro | End-to-End Encrypted Messaging System</p>
+            <div class="footer-links">
+                <a href="#" class="footer-link"><i class="fas fa-code"></i> API Docs</a>
+                <a href="#" class="footer-link"><i class="fas fa-shield-alt"></i> Security Whitepaper</a>
+                <a href="#" class="footer-link"><i class="fas fa-question-circle"></i> Help & Support</a>
+                <a href="#" class="footer-link"><i class="fas fa-github"></i> GitHub</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='chat.js') }}"></script>
+    <script>
+        // Additional helper functions for the new UI
+        function clearForm() {
+            document.getElementById('sender').value = '';
+            document.getElementById('receiver').value = '';
+            document.getElementById('message').value = '';
+            showToast('Form cleared successfully', 'info');
+        }
+        
+        function clearMessages() {
+            const box = document.getElementById('historyBox');
+            box.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3>Messages Cleared</h3>
+                    <p>Enter your username and click "Decrypt Messages" to view your encrypted messages</p>
+                </div>
+            `;
+            showToast('Message view cleared', 'info');
+        }
+        
+        // Toast notification system
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'toastOut 0.3s ease forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+        
+        // Add CSS for toast exit animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes toastOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
