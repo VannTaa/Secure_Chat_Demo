@@ -5,3 +5,7 @@ certs/*.srl
 # Python cache
 __pycache__/
 *.pyc
+
+# Users folder private keys
+Securechat/users/*.key
+Securechat/users/*.pem
